@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 
-const CustomAPIError = require('../errors/custom-error')
+const { BadRequest } = require('../errors')
 
 const login = async (req, res) => {
 	const { username, password } = req.body
@@ -9,7 +9,7 @@ const login = async (req, res) => {
 	// Por ahora solo nos fijamos si ingresaron info en la request. Lo hacemos en el mismo controller
 
 	if (!username || !password) {
-		throw new CustomAPIError('Please provide email and password', 400)
+		throw new BadRequest('Please provide email and password')
 	}
 
 	//A forma de Demo, esto deberia ser la ID generada por la DB
@@ -22,16 +22,13 @@ const login = async (req, res) => {
 	// no mandar password por aca, pero podemos mandar cualquier tipo de info. Sirve para instanciar cada info/elemento en cada usuario.
 	// en el token se deberia usar el ID, Creado en la DB... En este proyecto de prueba no se usa ya que no nos conectamos a una DB
 
-	console.log(username, password)
-
 	res.status(200).json({ msg: 'user created', token })
 }
 
 const dashboard = async (req, res) => {
-	console.log(req.headers)
 	const luckyNumber = Math.floor(Math.random() * 100)
 	res.status(200).json({
-		msg: `Hello, World`,
+		msg: `Hello, ${req.user.username}`, //Esta agarrando esta info del middleware Auth donde se destructura el token.
 		secret: `your data is ${luckyNumber}`,
 	})
 }
